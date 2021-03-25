@@ -1,5 +1,6 @@
 "Core/Src/ADC_ini.o"
 "Core/Src/Usart_2_ini.o"
+"Core/Src/direct_button.o"
 "Core/Src/lcd_ini.o"
 "Core/Src/main.o"
 "Core/Src/stm32f4xx_hal_msp.o"

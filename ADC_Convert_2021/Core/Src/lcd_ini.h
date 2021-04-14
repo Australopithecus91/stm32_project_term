@@ -29,9 +29,10 @@
 #define  rs0_reset() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET)
 
  void LCD_INI (void); // прототип функции
- void LCD_Write_Data (uint8_t dt);
- void LCD_Command(uint8_t dt);
- void LCD_INI (void);
+
+ void LCD_Clear (void);  // протототип функции очистки дисплея
+ void LCD_Send_Char(char ch);
+ void LCD_String (char* sym);
 
 
 #endif /* SRC_LCD_INI_H_ */

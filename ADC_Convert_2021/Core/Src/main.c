@@ -73,10 +73,8 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-float u;
-//float adc;
-//char str [20]; // массив данных
-//uint8_t str[]="USART Transmit\r\n";
+ float u;
+ char str[]="tempature ds18b20";
 
   /* USER CODE END 1 */
 
@@ -101,7 +99,8 @@ float u;
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  LCD_INI(); //
+    LCD_INI();  // функция инилизация дисплея
+    LCD_String(str); //
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,7 +108,7 @@ float u;
   while (1)
   {
 	  u=((float)HAL_ADC_GetValue(&hadc1))*(float)3.3/(float)4096;//
-	  //adc = convert_adc();
+
 	  usart_transmit();
 	  HAL_Delay(200);
 

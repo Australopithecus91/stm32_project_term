@@ -22,11 +22,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include "ADC_ini.h"
 #include "Usart_2_ini.h"
 #include "string.h"
 #include "lcd_ini.h"
-//#include "termo_spi.h"
+#include "termo_spi.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

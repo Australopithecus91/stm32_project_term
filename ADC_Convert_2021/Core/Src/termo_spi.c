@@ -6,9 +6,8 @@
  */
 
 #include "termo_spi.h"
-#include "stm32f4xx_hal.h"
-#include "gpio.h"
-#include "spi.h"
+
+//#define MAX_6675_SPI  &hspi1
 
 // ФУнкция возрата значение микросхемы
 
@@ -26,7 +25,7 @@
 	 MAX_6675_CS_SET(); // низкий уровень
 
 	 // Чтение микросхемы
-	hal_answer= HAL_SPI_Receive(MAX_6675_SPI, tempch , 2, 100);
+	hal_answer= HAL_SPI_Receive(&hspi1, tempch , 2, 100);
 
 	MAX_6675_CS_RESET();
 
@@ -55,5 +54,5 @@
 
 
 
-	 return reg*0.25
+	 return reg*0.25;
  }

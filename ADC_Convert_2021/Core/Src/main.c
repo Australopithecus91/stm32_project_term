@@ -26,7 +26,7 @@
 #include "Usart_2_ini.h"
 #include "string.h"
 #include "lcd_ini.h"
-#include "termo_spi.h"
+//#include "termo_spi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,12 +40,25 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#define MAX_6675_CS_SET()   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET)// незнанаю где chip select)
+#define MAX_6675_CS_RESET() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET) // chip select  1
+
+
+//проверка микросхемы
+
+#define MAX_6675_OK    1
+#define MAX_6675_ERROR 0
+
+// ФУнкция возрата значение микросхемы
+
+ uint8_t max6675_ReadReg (uint16_t *reg);
+
+// перевод принятых данных в температуру
+ float max6675_temp(uint16_t reg);
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
-
 SPI_HandleTypeDef hspi1;
 
 UART_HandleTypeDef huart2;
@@ -58,7 +71,6 @@ uint16_t ADC_Data; // gth
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_ADC1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
@@ -103,7 +115,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
@@ -190,56 +201,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-/**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ADC1_Init(void)
-{
-
-  /* USER CODE BEGIN ADC1_Init 0 */
-
-  /* USER CODE END ADC1_Init 0 */
-
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC1_Init 1 */
-
-  /* USER CODE END ADC1_Init 1 */
-  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_5;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN ADC1_Init 2 */
-
-  /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
@@ -367,13 +328,39 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1) //
+
+uint8_t max6675_ReadReg (uint16_t *reg)
 {
 
-    HAL_ADCEx_Calibration_Start(hadc1); // калибровка ацп
-    ADC_Data = HAL_ADC_GetValue(hadc1);    // преобразование
-    HAL_ADC_Start_IT (hadc1); // Запуск АЦП
+	 //возращаемые значение функции hal
+	 HAL_StatusTypeDef hal_answer= HAL_ERROR;
 
+	 // массив для полученных данных
+	 uint8_t tempch[2]= {0};
+
+	 //выбор микросхемы
+
+	 MAX_6675_CS_SET(); // низкий уровень
+
+	 // Чтение микросхемы
+	hal_answer= HAL_SPI_Receive(&hspi1, tempch , 2, 100);
+
+	MAX_6675_CS_RESET();
+
+	 if (hal_answer == HAL_OK)
+	 {
+		 // проверка на подключение датчика
+		 if(tempch[1]& 0x04) return  MAX_6675_ERROR 0;
+
+		 // преобразование полученных данных
+
+		 *reg (uint_16)(tempch>>3); //  сдвигаем на пять бит права
+		 *reg  (uint_16)(tempch<<5);
+
+		 return MAX_6675_OK;
+	 }
+
+	 return  MAX_6675_ERROR 0;
 
 }
 

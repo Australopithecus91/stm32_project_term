@@ -6,13 +6,16 @@
  */
 
 
+
 #ifndef INC_TERMO_SPI_H_
 #define INC_TERMO_SPI_H_
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_spi.h"
 
 
 //интерфейс spi
 
-#define MAX_6675_SPI    &hspi1 // указатель на структуру
+//#define MAX_6675_SPI &hspi // указатель на структуру
 
 #define MAX_6675_CS_SET()   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET)// незнанаю где chip select)
 #define MAX_6675_CS_RESET() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET) // chip select  1
